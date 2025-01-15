@@ -1,35 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+
+import { IProfile } from "@/interface/Profiles";
+
+import ProfileForm from "@/components/ProfileForm";
+import ProfileList from "@/components/ProfileList";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [profiles, setProfiles] = useState<IProfile[]>([]);
+
+  useEffect(() => {
+    chrome.storage.local.get("profiles", (result) => {
+      setProfiles(result.profiles || []);
+    });
+  }, []);
+
+  const saveProfiles = (updatedProfile: IProfile) => {
+    setProfiles((prevProfiles) => {
+      const newProfiles = [
+        ...prevProfiles,
+        { ...updatedProfile, id: crypto.randomUUID() },
+      ];
+      chrome.storage.local.set({ profiles: newProfiles });
+      return newProfiles;
+    });
+  };
+
+  const deleteProfile = (profileId: string) => {
+    setProfiles((prevProfiles) => {
+      const filteredProfiles = prevProfiles.filter(
+        ({ id }) => id !== profileId
+      );
+      chrome.storage.local.set({ profiles: filteredProfiles });
+      return filteredProfiles;
+    });
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="p-4 bg-gray-100 min-h-screen text-gray-800">
+      <h1 className="text-xl font-bold mb-4">Auto Fill</h1>
+      <ProfileForm onSave={saveProfiles} />
+      <ProfileList profiles={profiles} onDelete={deleteProfile} />
+    </div>
+  );
 }
 
-export default App
+export default App;

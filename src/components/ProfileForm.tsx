@@ -1,8 +1,6 @@
 import { IProfile } from "@/interface/Profiles";
 import { useForm } from "react-hook-form";
 
-
-
 interface IProfileFormProps {
   onSave: (data: IProfile) => void;
 }
@@ -15,7 +13,7 @@ export default function ProfileForm({ onSave }: IProfileFormProps) {
     formState: { errors },
   } = useForm<IProfile>();
 
-  const onSubmit = (data: { name: string; email: string }) => {
+  const onSubmit = (data: IProfile) => {
     console.log(data);
     onSave(data);
     reset();

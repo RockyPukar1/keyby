@@ -1,11 +1,14 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import { fillForm } from "@/utils/helper";
 
 import { IProfile } from "@/interface/Profiles";
 
 import FillFormButton from "@/components/FillFormButton";
-import { fillForm } from "@/utils/helper";
 
 export default function Content() {
+  const selectedProfileRef = useRef<IProfile | null>(null);
+
   const [profiles, setProfiles] = useState<IProfile[] | []>([]);
   const [selectedProfile, setSelectedProfile] = useState<IProfile | null>(null);
   const [isAutofillActive, setIsAutofillActive] = useState(true);
@@ -17,16 +20,26 @@ export default function Content() {
     }
   };
 
-  const saveProfile = useCallback((updatedProfile: IProfile) => {
-    setProfiles((prevProfiles) => {
-      const newProfiles = [
-        ...prevProfiles,
-        { ...updatedProfile, id: crypto.randomUUID() },
-      ];
-      chrome.storage.local.set({ profiles: newProfiles });
-      return newProfiles;
-    });
+  const updateProfileField = useCallback((fieldName: string, value: string) => {
+    const profile = selectedProfileRef.current;
+    if (profile) {
+      const updatedProfile = { ...profile, [fieldName]: value };
+      setProfiles((prevProfiles) => {
+        const newProfile = prevProfiles.map((p) =>
+          p.id === profile.id ? updatedProfile : p
+        );
+        chrome.storage.local.set({
+          profiles: newProfile,
+        });
+        return newProfile;
+      });
+      setSelectedProfile(updatedProfile);
+    }
   }, []);
+
+  useEffect(() => {
+    selectedProfileRef.current = selectedProfile;
+  }, [selectedProfile]);
 
   useEffect(() => {
     chrome.storage.local.get("profiles", (result) => {
@@ -38,46 +51,35 @@ export default function Content() {
   }, []);
 
   useEffect(() => {
-    const handleClick = (event: MouseEvent) => {
-      if (
-        event.target instanceof HTMLInputElement ||
-        event.target instanceof HTMLTextAreaElement
-      ) {
-        if (isAutofillActive && selectedProfile) {
-          fillForm(selectedProfile);
-        }
-      }
-    };
+    const formElements = document.querySelectorAll("input, textarea");
 
-    document.addEventListener("click", handleClick);
-    return () => {
-      document.removeEventListener("click", handleClick);
-    };
-  }, [isAutofillActive, selectedProfile]);
+    formElements.forEach((input) => {
+      const targetInput = input as HTMLInputElement | HTMLTextAreaElement;
+      const fieldName = targetInput.name || targetInput.id;
+      if (
+        fieldName &&
+        !input.nextElementSibling?.classList.contains("update-icon")
+      ) {
+        const icon = document.createElement("span");
+        icon.textContent = "✎";
+        icon.className =
+          "update-icon right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer text-lg pointer-cursor";
+        icon.onclick = () => {
+          updateProfileField(fieldName, targetInput.value);
+        };
+        targetInput.style.paddingRight = "30px";
+
+        const parentNode = targetInput.parentNode as HTMLElement;
+        parentNode.appendChild(icon);
+      }
+    });
+  }, [selectedProfile, updateProfileField]);
 
   useEffect(() => {
-    const handleInputChange = (event: Event) => {
-      const target = event.target as HTMLInputElement | HTMLTextAreaElement;
-      if (target && selectedProfile && (target.name || target.id)) {
-        const newProfile = {
-          ...selectedProfile,
-          [target.name || target.id]: target.value,
-        };
-        saveProfile(newProfile);
-      }
-    };
-
-    const formElements = document.querySelectorAll("input, textarea");
-    formElements.forEach((el) =>
-      el.addEventListener("input", handleInputChange)
-    );
-
-    return () => {
-      formElements.forEach((el) =>
-        el.removeEventListener("input", handleInputChange)
-      );
-    };
-  }, [selectedProfile, saveProfile]);
+    if (isAutofillActive && selectedProfile) {
+      fillForm(selectedProfile);
+    }
+  }, [isAutofillActive, selectedProfile]);
 
   if (!profiles.length) {
     return null;

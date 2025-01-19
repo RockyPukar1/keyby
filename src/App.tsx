@@ -36,7 +36,7 @@ function App() {
   };
 
   return (
-    <div className="p-4 bg-gray-100 min-h-screen text-gray-800">
+    <div className="min-w-96 p-4 bg-gray-100 min-h-screen text-gray-800">
       <h1 className="text-xl font-bold mb-4">Auto Fill</h1>
       <ProfileForm onSave={saveProfile} />
       <ProfileList profiles={profiles} onDelete={deleteProfile} />

@@ -21,7 +21,7 @@ export default function ProfileList({ profiles, onDelete }: IProfileListProps) {
             </div>
             <button
               onClick={() => onDelete(id)}
-              className="b-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
             >
               Delete
             </button>

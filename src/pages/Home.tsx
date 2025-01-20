@@ -6,7 +6,7 @@ import ProfileForm from "@/components/ProfileForm";
 import ProfileList from "@/components/ProfileList";
 import toast from "react-hot-toast";
 
-function App() {
+export default function Home() {
   const [profiles, setProfiles] = useState<IProfile[]>([]);
 
   useEffect(() => {
@@ -39,12 +39,10 @@ function App() {
   };
 
   return (
-    <div className="min-w-96 p-4 bg-gray-100 min-h-screen text-gray-800">
+    <div>
       <h1 className="text-xl font-bold mb-4">Auto Fill</h1>
-      <ProfileForm onSave={saveProfile} />
+      <ProfileForm onSave={saveProfile} isEditing={true} />
       <ProfileList profiles={profiles} onDelete={deleteProfile} />
     </div>
   );
 }
-
-export default App;

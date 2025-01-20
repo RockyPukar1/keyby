@@ -1,4 +1,5 @@
 import { IProfile } from "@/interface/Profiles";
+import { Link } from "react-router-dom";
 
 interface IProfileListProps {
   profiles: IProfile[];
@@ -11,9 +12,10 @@ export default function ProfileList({ profiles, onDelete }: IProfileListProps) {
       <h2 className="text-lg font-semibold mb-2">Saved Profile</h2>
       <ul className="space-y-2">
         {profiles.map(({ id, name, email }) => (
-          <li
+          <Link
+            to={`/profile/${id}`}
             key={id}
-            className="bg-white shadow rounded p-4 flex justify-between items-center "
+            className="bg-white shadow rounded p-4 flex justify-between items-center"
           >
             <div>
               <p className="text-sm font-medium">{name}</p>
@@ -25,7 +27,7 @@ export default function ProfileList({ profiles, onDelete }: IProfileListProps) {
             >
               Delete
             </button>
-          </li>
+          </Link>
         ))}
       </ul>
     </div>

@@ -5,6 +5,7 @@ import { fillForm } from "@/utils/helper";
 import { IProfile } from "@/interface/Profiles";
 
 import FillFormButton from "@/components/FillFormButton";
+import toast from "react-hot-toast";
 
 export default function Content() {
   const selectedProfileRef = useRef<IProfile | null>(null);
@@ -33,6 +34,7 @@ export default function Content() {
         });
         return newProfile;
       });
+      toast.success(`${fieldName} updated successfully`);
       setSelectedProfile(updatedProfile);
     }
   }, []);

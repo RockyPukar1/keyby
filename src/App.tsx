@@ -4,6 +4,7 @@ import { IProfile } from "@/interface/Profiles";
 
 import ProfileForm from "@/components/ProfileForm";
 import ProfileList from "@/components/ProfileList";
+import toast from "react-hot-toast";
 
 function App() {
   const [profiles, setProfiles] = useState<IProfile[]>([]);
@@ -23,6 +24,7 @@ function App() {
       chrome.storage.local.set({ profiles: newProfiles });
       return newProfiles;
     });
+    toast.success("New Profile added successfully");
   };
 
   const deleteProfile = (profileId: string) => {
@@ -33,6 +35,7 @@ function App() {
       chrome.storage.local.set({ profiles: filteredProfiles });
       return filteredProfiles;
     });
+    toast.success("Profile deleted successfully");
   };
 
   return (

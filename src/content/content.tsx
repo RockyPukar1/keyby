@@ -51,28 +51,30 @@ export default function Content() {
   }, []);
 
   useEffect(() => {
-    const formElements = document.querySelectorAll("input, textarea");
+    if (selectedProfile) {
+      const formElements = document.querySelectorAll("input, textarea");
 
-    formElements.forEach((input) => {
-      const targetInput = input as HTMLInputElement | HTMLTextAreaElement;
-      const fieldName = targetInput.name || targetInput.id;
-      if (
-        fieldName &&
-        !input.nextElementSibling?.classList.contains("update-icon")
-      ) {
-        const icon = document.createElement("span");
-        icon.textContent = "✎";
-        icon.className =
-          "update-icon right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer text-lg pointer-cursor";
-        icon.onclick = () => {
-          updateProfileField(fieldName, targetInput.value);
-        };
-        targetInput.style.paddingRight = "30px";
+      formElements.forEach((input) => {
+        const targetInput = input as HTMLInputElement | HTMLTextAreaElement;
+        const fieldName = targetInput.name || targetInput.id;
+        if (
+          fieldName &&
+          !input.nextElementSibling?.classList.contains("update-icon")
+        ) {
+          const icon = document.createElement("span");
+          icon.textContent = "✎";
+          icon.className =
+            "update-icon right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer text-lg pointer-cursor";
+          icon.onclick = () => {
+            updateProfileField(fieldName, targetInput.value);
+          };
+          targetInput.style.paddingRight = "30px";
 
-        const parentNode = targetInput.parentNode as HTMLElement;
-        parentNode.appendChild(icon);
-      }
-    });
+          const parentNode = targetInput.parentNode as HTMLElement;
+          parentNode.appendChild(icon);
+        }
+      });
+    }
   }, [selectedProfile, updateProfileField]);
 
   useEffect(() => {

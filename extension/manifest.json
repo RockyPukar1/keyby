@@ -7,8 +7,13 @@
     "default_popup": "index.html"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "identity"
   ],
+  "oauth2": {
+    "client_id": "<CLIENT_ID>",
+    "scopes": ["email", "profile", "openid"]
+  },
   "content_scripts": [
     {
       "js": ["src/content.tsx"],
